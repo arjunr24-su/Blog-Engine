@@ -151,6 +151,7 @@ dependencies = [
  "rocket",
  "rocket_dyn_templates",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1538,7 +1539,6 @@ dependencies = [
  "rocket_codegen",
  "rocket_http",
  "serde",
- "serde_json",
  "state",
  "tempfile",
  "time",

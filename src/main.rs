@@ -3,10 +3,10 @@ extern crate rocket;
 
 use rocket_dyn_templates::{context, Template};
 use reqwest::blocking::Client;
-use serde::{Deserialize, Serialize}; // Import both Deserialize and Serialize
+use serde::{Deserialize, Serialize};
 use rocket::fs::{FileServer, relative};
 
-#[derive(Deserialize, Serialize, Debug)] // Combine both derives
+#[derive(Deserialize, Serialize, Debug)]
 struct Article {
     id: i32,
     title: String,
@@ -17,7 +17,7 @@ struct Article {
 #[get("/")]
 fn index() -> Template {
     let context = context! {
-        title: "Welcome to Blog Engine",
+        title: "Blog Engine",
         message: "This is the home page"
     };
     Template::render("index", &context)
@@ -34,7 +34,7 @@ fn render_post() -> Template {
         articles: articles,
     };
 
-    Template::render("post", &context)
+    Template::render("blog", &context)
 }
 
 // Function to fetch blog data using reqwest
@@ -50,9 +50,13 @@ fn fetch_blog_data() -> Vec<Article> {
         .expect("Failed to send request");
 
     if response.status().is_success() {
-        response.json::<Vec<Article>>().expect("Failed to parse JSON")
+        response.json::<Vec<Article>>().unwrap_or_else(|_| {
+            println!("Failed to parse JSON, returning empty vector");
+            vec![] // Return empty vector on parse failure
+        })
     } else {
-        panic!("Error fetching blog data: {}", response.status());
+        println!("Error fetching blog data: {}", response.status());
+        vec![] // Return empty vector on request failure
     }
 }
 
@@ -70,5 +74,5 @@ fn rocket() -> _ {
     rocket::build()
         .mount("/", routes![index, render_post, category_page])
         .attach(Template::fairing())
-        .mount("/static", FileServer::from(relative!("static")))
+        .mount("/static", FileServer::from(relative!("static"))) // Ensure this is only included once
 }
