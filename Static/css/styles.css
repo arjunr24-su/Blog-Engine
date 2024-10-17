@@ -36,3 +36,8 @@ footer {
     bottom: 0;
     width: 100%;
 }
+/* Optional custom styles */
+body.bg-dark {
+    background-color: #343a40 !important;
+    color: #f8f9fa !important;
+}
