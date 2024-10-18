@@ -86,7 +86,8 @@ fn markdown_to_html(markdown: &str) -> String {
 fn index() -> Template {
     let context = context! {
         title: "Blog Engine",
-        message: "This is the home page"
+        message: "This is the home page",
+        recent_articles: Vec::<Article>::new(), // Explicitly define the type as Vec<Article>
     };
     Template::render("index", &context)
 }
@@ -123,7 +124,7 @@ fn category_page(category_name: &str) -> Template {
 #[get("/posts")]
 fn list_posts() -> Template {
     let api_key = "44h9fR1BfEW98AUVrkNJYVbd"; // Your Dev.to API Key
-    let mut devto_articles = fetch_blog_data(&api_key).unwrap_or_else(|_| vec![]);
+    let devto_articles = fetch_blog_data(&api_key).unwrap_or_else(|_| vec![]);
     let hacker_news_articles = fetch_hacker_news_data().unwrap_or_else(|_| vec![]);
     
     // Make sure devto_articles is mutable
