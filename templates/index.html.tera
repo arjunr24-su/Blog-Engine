@@ -21,10 +21,16 @@
                     <a class="nav-link" href="/posts">All Posts</a> <!-- Link to All Posts -->
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/tech">Tech</a> <!-- Link to Tech Category -->
+                    <a class="nav-link" href="/category/Tech">Tech</a> <!-- Link to Tech Category -->
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/security">Security</a> <!-- Link to Security Category -->
+                    <a class="nav-link" href="/category/Security">Security</a> <!-- Link to Security Category -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/Lifestyle">Lifestyle</a> <!-- Link to Lifestyle Category -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/News">News</a> <!-- Link to News Category -->
                 </li>
             </ul>
             <button id="theme-toggle" class="btn btn-outline-secondary ms-auto">Toggle Dark Mode</button>
@@ -46,6 +52,15 @@
             {% else %}
                 <li class="list-group-item">No recent posts found.</li>
             {% endfor %}
+        </ul>
+
+        <!-- Add category links -->
+        <h2>Categories</h2>
+        <ul class="list-group">
+            <li class="list-group-item"><a href="/category/Tech">Tech</a></li>
+            <li class="list-group-item"><a href="/category/Lifestyle">Lifestyle</a></li>
+            <li class="list-group-item"><a href="/category/News">News</a></li>
+            <li class="list-group-item"><a href="/category/Security">Security</a></li>
         </ul>
     </div>
 

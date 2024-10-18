@@ -6,71 +6,30 @@ use reqwest::blocking::Client;
 use serde::{Deserialize, Serialize};
 use rocket::fs::{FileServer, relative};
 use pulldown_cmark::{Parser, html};
+use rocket::http::Status;
 
-// Structs for Articles and Hacker News Items
+// Struct for Ghost Articles
 #[derive(Deserialize, Serialize, Debug, Clone)]
-struct Article {
-    id: i32,
+struct GhostArticle {
+    id: String,
     title: String,
     url: String,
-    description: String,
-    category: String,
+    excerpt: String,
+    tags: Vec<String>,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct HackerNewsItem {
-    id: u32,
-    title: String,
-    url: Option<String>,
-}
-
-// Function to fetch blog data from Dev.to
-fn fetch_blog_data(api_key: &str) -> Result<Vec<Article>, Box<dyn std::error::Error>> {
-    let url = "https://dev.to/api/articles/me/published";
+// Function to fetch blog data from Ghost
+fn fetch_blog_data(api_key: &str, blog_url: &str) -> Result<Vec<GhostArticle>, Box<dyn std::error::Error>> {
+    let url = format!("{}/ghost/api/v3/content/posts/?key={}", blog_url, api_key);
     let client = Client::new();
-    let response = client.get(url)
-        .header("Authorization", format!("Bearer {}", api_key))
-        .send()?;
+    let response = client.get(&url).send()?;
 
     if response.status().is_success() {
-        let articles = response.json::<Vec<Article>>()?;
+        let json: serde_json::Value = response.json()?;
+        let articles: Vec<GhostArticle> = serde_json::from_value(json["posts"].clone())?;
         Ok(articles)
     } else {
         Err(format!("Error fetching blog data: {}", response.status()).into())
-    }
-}
-
-// Function to fetch Hacker News data
-fn fetch_hacker_news_data() -> Result<Vec<Article>, Box<dyn std::error::Error>> {
-    let hacker_news_url = "https://hacker-news.firebaseio.com/v0/topstories.json";
-    
-    let client = Client::new();
-    let response = client.get(hacker_news_url).send()?;
-
-    if response.status().is_success() {
-        let story_ids: Vec<u32> = response.json()?;
-        
-        let mut stories = Vec::new();
-        for id in story_ids.iter().take(10) {
-            let item_url = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", id);
-            let item_response = client.get(&item_url).send()?;
-
-            if item_response.status().is_success() {
-                if let Ok(story) = item_response.json::<HackerNewsItem>() {
-                    stories.push(Article {
-                        id: story.id as i32,
-                        title: story.title,
-                        url: story.url.unwrap_or_else(|| "https://news.ycombinator.com".to_string()),
-                        description: "Hacker News story".to_string(),
-                        category: "News".to_string(),
-                    });
-                }
-            }
-        }
-
-        Ok(stories)
-    } else {
-        Err(format!("Error fetching Hacker News data: {}", response.status()).into())
     }
 }
 
@@ -82,58 +41,45 @@ fn markdown_to_html(markdown: &str) -> String {
     html_output
 }
 
+// Fake blog data function
+fn fetch_fake_blog_data() -> Vec<GhostArticle> {
+    vec![
+        GhostArticle {
+            id: String::from("1"),
+            title: String::from("Fake Blog Post 1"),
+            url: String::from("https://example.com/post1"),
+            excerpt: String::from("This is a description for fake blog post 1."),
+            tags: vec![String::from("Tech")],
+        },
+        GhostArticle {
+            id: String::from("2"),
+            title: String::from("Fake Blog Post 2"),
+            url: String::from("https://example.com/post2"),
+            excerpt: String::from("This is a description for fake blog post 2."),
+            tags: vec![String::from("Lifestyle")],
+        },
+    ]
+}
+
 #[get("/")]
 fn index() -> Template {
     let context = context! {
         title: "Blog Engine",
         message: "This is the home page",
-        recent_articles: Vec::<Article>::new(), // Explicitly define the type as Vec<Article>
+        recent_articles: Vec::<GhostArticle>::new(),
     };
     Template::render("index", &context)
 }
 
-#[get("/post")]
-fn render_post() -> Template {
-    let api_key = "44h9fR1BfEW98AUVrkNJYVbd"; // Your Dev.to API Key
-    let mut devto_articles = fetch_blog_data(&api_key).unwrap_or_else(|_| vec![]);
-    let hacker_news_articles = fetch_hacker_news_data().unwrap_or_else(|_| vec![]);
-
-    // Ensure devto_articles is mutable
-    for article in &mut devto_articles {
-        article.description = markdown_to_html(&article.description);
-    }
-
-    let context = context! {
-        title: "External Blog Posts",
-        devto_articles,
-        hacker_news_articles,
-    };
-
-    Template::render("blog", &context)
-}
-
-#[get("/category/<category_name>")]
-fn category_page(category_name: &str) -> Template {
-    let context = context! {
-        category: category_name,
-        posts: vec!["Post 1", "Post 2"],  // Replace with actual filtered posts
-    };
-    Template::render("category", &context)
-}
-
 #[get("/posts")]
 fn list_posts() -> Template {
-    let api_key = "44h9fR1BfEW98AUVrkNJYVbd"; // Your Dev.to API Key
-    let devto_articles = fetch_blog_data(&api_key).unwrap_or_else(|_| vec![]);
-    let hacker_news_articles = fetch_hacker_news_data().unwrap_or_else(|_| vec![]);
-    
-    // Make sure devto_articles is mutable
-    let mut all_articles = devto_articles.clone(); // Now this is valid
-    all_articles.extend(hacker_news_articles);
+    let api_key = "YOUR_GHOST_API_KEY"; // Your Ghost API Key
+    let blog_url = "YOUR_GHOST_BLOG_URL"; // Your Ghost Blog URL
+    let articles = fetch_blog_data(api_key, blog_url).unwrap_or_else(|_| fetch_fake_blog_data());
 
     let context = context! {
         title: "All Blog Posts",
-        articles: all_articles,
+        articles,
     };
 
     Template::render("posts", &context)
@@ -142,7 +88,7 @@ fn list_posts() -> Template {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, render_post, category_page, list_posts])
+        .mount("/", routes![index, list_posts])
         .attach(Template::fairing())
         .mount("/static", FileServer::from(relative!("static")))
 }
