@@ -15,16 +15,38 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/posts">All Posts</a> <!-- Link to All Posts -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/tech">Tech</a> <!-- Link to Tech Category -->
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/category/security">Security</a> <!-- Link to Security Category -->
                 </li>
             </ul>
             <button id="theme-toggle" class="btn btn-outline-secondary ms-auto">Toggle Dark Mode</button>
         </div>
     </nav>
     
-    <div class="container">
+    <div class="container mt-4">
         <h1>Welcome to Your Blog</h1>
         <p>Your content goes here.</p>
+        
+        <!-- Example of adding recent posts or articles -->
+        <h2>Recent Posts</h2>
+        <ul class="list-group">
+            {% for article in recent_articles %}
+                <li class="list-group-item">
+                    <h5><a href="{{ article.url }}">{{ article.title }}</a></h5>
+                    <p>{{ article.description | raw }}</p> <!-- Render HTML content -->
+                </li>
+            {% else %}
+                <li class="list-group-item">No recent posts found.</li>
+            {% endfor %}
+        </ul>
     </div>
 
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

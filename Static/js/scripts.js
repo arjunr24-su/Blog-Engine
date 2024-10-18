@@ -6,22 +6,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('JavaScript is loaded!');
 
-    // Check localStorage for theme preference
-    if (localStorage.getItem('theme') === 'dark') {
+    // Check localStorage for theme preference and apply it
+    const theme = localStorage.getItem('theme') || 'light'; // Default to light if no preference is set
+    if (theme === 'dark') {
         body.classList.add('bg-dark', 'text-white');
-        body.classList.remove('bg-light', 'text-dark');
         themeToggleBtn.textContent = 'Toggle Light Mode';
+    } else {
+        body.classList.add('bg-light', 'text-dark'); // Ensure light mode is set up
+        themeToggleBtn.textContent = 'Toggle Dark Mode';
     }
 
     // Add event listener for theme toggle button
     themeToggleBtn.addEventListener('click', () => {
-        body.classList.toggle('bg-dark');
+        const isDarkMode = body.classList.toggle('bg-dark');
         body.classList.toggle('text-white');
         body.classList.toggle('bg-light');
         body.classList.toggle('text-dark');
         
         // Save the theme preference in localStorage
-        if (body.classList.contains('bg-dark')) {
+        if (isDarkMode) {
             localStorage.setItem('theme', 'dark');
             themeToggleBtn.textContent = 'Toggle Light Mode';
         } else {

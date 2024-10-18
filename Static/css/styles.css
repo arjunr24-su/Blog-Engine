@@ -1,3 +1,4 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,6 +6,7 @@ body {
     background-color: #f4f4f4;
 }
 
+/* Header Styles */
 header {
     background: #35424a;
     color: #ffffff;
@@ -12,6 +14,7 @@ header {
     text-align: center;
 }
 
+/* Navigation Styles */
 nav ul {
     list-style: none;
     padding: 0;
@@ -25,8 +28,33 @@ nav ul li {
 nav ul li a {
     color: #ffffff;
     text-decoration: none;
+    transition: color 0.3s; /* Smooth transition for hover effect */
 }
 
+nav ul li a:hover {
+    color: #f8f9fa; /* Lighter color on hover */
+}
+
+/* Main Content Styles */
+main {
+    padding: 20px; /* Add padding to the main content */
+}
+
+/* Blog Post Styles */
+h2 {
+    color: #35424a; /* Color for section headings */
+    margin-top: 20px;
+}
+
+ul {
+    padding-left: 20px; /* Add some padding for list items */
+}
+
+li {
+    margin-bottom: 10px; /* Space between list items */
+}
+
+/* Footer Styles */
 footer {
     text-align: center;
     padding: 10px 0;
@@ -36,8 +64,25 @@ footer {
     bottom: 0;
     width: 100%;
 }
-/* Optional custom styles */
+
+/* Dark Mode Styles */
 body.bg-dark {
     background-color: #343a40 !important;
     color: #f8f9fa !important;
+}
+
+a {
+    color: #35424a; /* Default link color */
+}
+
+a:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav ul li {
+        display: block; /* Stack navigation items on small screens */
+        margin: 10px 0;
+    }
 }

@@ -1,16 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Posts in {{ category }}</title>
     <link rel="stylesheet" href="/static/css/styles.css">
     <script src="/static/js/scripts.js" defer></script>
 </head>
 <body>
-    <h1>Posts in {{ category }}</h1>
-    <ul>
-        {% for post in posts %}
-        <li>{{ post }}</li>
-        {% endfor %}
-    </ul>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/category/tech">Tech</a></li>
+                <li><a href="/category/security">Security</a></li>
+                <li><a href="/posts">All Posts</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Posts in "{{ category }}"</h1>
+        
+        <ul>
+            {% for post in posts %}
+                <li>
+                    <h3><a href="{{ post.url }}">{{ post.title }}</a></h3>
+                    <p>{{ post.description | raw }}</p> <!-- Assuming description is in HTML format -->
+                </li>
+            {% else %}
+                <li>No posts found in this category.</li>
+            {% endfor %}
+        </ul>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Blog Engine</p>
+    </footer>
 </body>
 </html>

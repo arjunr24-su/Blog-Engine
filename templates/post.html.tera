@@ -32,9 +32,18 @@
             </div>
         </nav>
     </header>
+    
     <main class="container mt-4">
-        <h2>{{ message }}</h2>
+        <h2>{{ post.title }}</h2>
+        <p><small>Published on: {{ post.published_date }}</small></p>
+        <div class="post-content">
+            {{ post.content | raw }} <!-- Assuming content is HTML formatted -->
+        </div>
+        <div class="mt-4">
+            <a href="/category/{{ post.category }}" class="btn btn-secondary">Back to {{ post.category }} Posts</a>
+        </div>
     </main>
+    
     <footer class="text-center mt-4">
         <p>&copy; 2024 Blog Engine</p>
     </footer>
