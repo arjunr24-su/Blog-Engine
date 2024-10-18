@@ -67,7 +67,7 @@ footer {
 
 /* Dark Mode Styles */
 body.bg-dark {
-    background-color: #343a40 !important;
+    background-color: #000000 !important;
     color: #f8f9fa !important;
 }
 

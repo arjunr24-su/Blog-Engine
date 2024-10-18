@@ -22,10 +22,10 @@
                             <a class="nav-link" href="/">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/category/tech">Tech</a>
+                            <a class="nav-link" href="/category/Tech">Tech</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/category/security">Security</a>
+                            <a class="nav-link" href="/category/Security">Security</a>
                         </li>
                     </ul>
                 </div>
@@ -34,12 +34,16 @@
     </header>
     
     <main class="container mt-4">
-        <h1>All Blog Posts</h1>
+        <h1>{{ title }}</h1>
         {% for article in articles %}
             <div class="mb-4">
                 <h2><a href="{{ article.url }}">{{ article.title }}</a></h2>
-                <p>{{ article.description }}</p>
-                <p>Category: <a href="/category/{{ article.category }}">{{ article.category }}</a></p>
+                <p>{{ article.excerpt }}</p> <!-- Changed from description to excerpt -->
+                <p>Category: <a href="/category/{{ article.tags[0] }}">{{ article.tags[0] }}</a></p> <!-- Assuming the first tag is the category -->
+                <div>
+                    {{ article.content | safe }} <!-- Render Markdown content safely -->
+                </div>
+                <p><a href="{{ article.url }}">Read more</a></p>
             </div>
         {% endfor %}
     </main>

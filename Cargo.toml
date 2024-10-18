@@ -1,12 +1,13 @@
 [package]
-name = "your_project_name"  # Replace with your project name
+name = "blog_engine"
 version = "0.1.0"
 edition = "2021"
 
+# Dependencies
 [dependencies]
-rocket = "0.5.1"  # Rocket web framework for building web applications
-rocket_dyn_templates = { version = "0.1.0", features = ["tera"] }  # Tera template engine integration for dynamic HTML
-reqwest = { version = "0.11", features = ["blocking", "json"] }  # HTTP client for making requests (blocking and JSON support)
-serde = { version = "1.0", features = ["derive"] }  # Serialization and deserialization framework
-serde_json = "1.0"  # JSON support for Serde
-pulldown-cmark = "0.8"  # Markdown parsing for rendering blog post content
+rocket = { version = "0.5.1" } # No features required
+rocket_dyn_templates = { version = "0.1.0", features = ["tera"] } # Use Tera as your template engine
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+pulldown-cmark = "0.8"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

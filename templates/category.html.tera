@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -30,17 +30,20 @@
     <div class="container mt-4">
         <h1>Articles in Category: {{ title }}</h1>
         <ul class="list-group">
-            {% for post in posts %}
-                <li class="list-group-item">
-                    <h5><a href="{{ post.url }}">{{ post.title }}</a></h5>
-                    <p>{{ post.description | raw }}</p> <!-- Render HTML content -->
-                </li>
+            {% if articles|length == 0 %}
+                <li class="list-group-item">No articles found in this category.</li>
             {% else %}
-                <li class="list-group-item">No posts found in this category.</li>
-            {% endfor %}
+                {% for article in articles %}
+                    <li class="list-group-item">
+                        <h5><a href="{{ article.url }}">{{ article.title }}</a></h5>
+                        <p>{{ article.excerpt }}</p> <!-- Render excerpt -->
+                    </li>
+                {% endfor %}
+            {% endif %}
         </ul>
     </div>
     
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/scripts.js"></script>
 </body>
 </html>
