@@ -154,7 +154,7 @@ fn list_posts() -> Template {
 
 #[get("/category/<tag>")]
 fn posts_by_category(tag: String) -> Template {
-    let api_key = env::var("DEVTO_API_KEY").expect("Dev.to API key not set");
+    let api_key = env::var("wr97LShzGaQBpA48BhnkuFwF").expect("Dev.to API key not set");
     let articles_result = fetch_blog_data(&api_key);
 
     let filtered_articles = match articles_result {
