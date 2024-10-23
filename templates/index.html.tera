@@ -5,9 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>{{ title }}</title>
+    <style>
+        /* General Body Styles */
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Navbar Styles */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.9); /* Transparent background */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            border-radius: 0 0 10px 10px; /* Rounded bottom corners */
+            padding: 15px 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #35424a; /* Initial color */
+            transition: color 0.3s ease; /* Smooth color transition */
+        }
+
+        .navbar-brand:hover {
+            color: #007bff; /* Color change on hover */
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #007bff; /* Hover color */
+        }
+
+        /* Dark Mode for Navbar */
+        body.bg-dark .navbar {
+            background-color: rgba(0, 0, 0, 0.85) !important; /* Darker transparent background */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        body.bg-dark .navbar-brand {
+            color: #f8f9fa !important; /* White color for dark mode */
+        }
+
+        body.bg-dark .nav-link {
+            color: #f8f9fa !important;
+        }
+
+        body.bg-dark .nav-link:hover {
+            color: #3498db !important;
+        }
+
+        /* Main Content Styles */
+        .container {
+            max-width: 1200px;
+            margin-top: 60px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #35424a;
+        }
+
+        h2 {
+            margin-top: 40px;
+            font-size: 2rem;
+            color: #35424a;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .list-group-item {
+            background-color: #fff;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .list-group-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .list-group-item h5 a {
+            color: #35424a;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .list-group-item h5 a:hover {
+            color: #007bff;
+        }
+
+        /* Dark Mode Styles */
+        body.bg-dark {
+            background-color: #1c1c1c !important;
+            color: #f8f9fa !important;
+        }
+
+        body.bg-dark h1, 
+        body.bg-dark h2 {
+            color: #f8f9fa !important; /* White text in dark mode */
+        }
+
+        body.bg-dark .list-group-item {
+            background-color: #333 !important;
+            color: #f8f9fa !important;
+        }
+
+        body.bg-dark .list-group-item h5 a {
+            color: #f8f9fa !important;
+        }
+
+        body.bg-dark .list-group-item h5 a:hover {
+            color: #3498db !important;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            background-color: #35424a;
+            color: #ffffff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .navbar {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg">
         <a class="navbar-brand" href="#">{{ title }}</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -18,36 +168,36 @@
                     <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/posts">All Posts</a> <!-- Link to All Posts -->
+                    <a class="nav-link" href="/posts">All Posts</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/Tech">Tech</a> <!-- Link to Tech Category -->
+                    <a class="nav-link" href="/category/Tech">Tech</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/Security">Security</a> <!-- Link to Security Category -->
+                    <a class="nav-link" href="/category/Security">Security</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/Lifestyle">Lifestyle</a> <!-- Link to Lifestyle Category -->
+                    <a class="nav-link" href="/category/Lifestyle">Lifestyle</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/category/News">News</a> <!-- Link to News Category -->
+                    <a class="nav-link" href="/category/News">News</a>
                 </li>
             </ul>
             <button id="theme-toggle" class="btn btn-outline-secondary ms-auto">Toggle Dark Mode</button>
         </div>
     </nav>
-    
+
     <div class="container mt-4">
         <h1>Welcome to Your Blog</h1>
         <p>Your content goes here.</p>
-        
+
         <!-- Example of adding recent posts or articles -->
         <h2>Recent Posts</h2>
         <ul class="list-group">
             {% for article in recent_articles %}
                 <li class="list-group-item">
                     <h5><a href="{{ article.url }}">{{ article.title }}</a></h5>
-                    <p>{{ article.description | raw }}</p> <!-- Render HTML content -->
+                    <p>{{ article.description | raw }}</p>
                 </li>
             {% else %}
                 <li class="list-group-item">No recent posts found.</li>
@@ -63,6 +213,10 @@
             <li class="list-group-item"><a href="/category/Security">Security</a></li>
         </ul>
     </div>
+
+    <footer>
+        <p>&copy; 2024 Blog Engine</p>
+    </footer>
 
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/scripts.js"></script> <!-- Link your custom script here -->

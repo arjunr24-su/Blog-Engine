@@ -4,6 +4,8 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
 }
 
 /* Header Styles */
@@ -12,23 +14,30 @@ header {
     color: #ffffff;
     padding: 20px 0;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for header */
 }
 
-/* Navigation Styles */
-nav ul {
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+header nav ul {
     list-style: none;
     padding: 0;
+    margin: 10px 0 0 0;
 }
 
 nav ul li {
-    display: inline;
+    display: inline-block;
     margin: 0 15px;
 }
 
 nav ul li a {
     color: #ffffff;
     text-decoration: none;
-    transition: color 0.3s; /* Smooth transition for hover effect */
+    font-weight: bold;
+    transition: color 0.3s ease-in-out; /* Smooth transition for hover effect */
 }
 
 nav ul li a:hover {
@@ -37,52 +46,237 @@ nav ul li a:hover {
 
 /* Main Content Styles */
 main {
-    padding: 20px; /* Add padding to the main content */
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
 }
 
-/* Blog Post Styles */
 h2 {
-    color: #35424a; /* Color for section headings */
-    margin-top: 20px;
+    color: #35424a;
+    margin-top: 40px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
 }
 
 ul {
-    padding-left: 20px; /* Add some padding for list items */
+    list-style-type: none;
+    padding-left: 0;
 }
 
 li {
-    margin-bottom: 10px; /* Space between list items */
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Card-like appearance */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth scaling */
+}
+
+li:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+li h3 a {
+    color: #35424a;
+    font-size: 1.4rem;
+}
+
+li p {
+    margin: 10px 0;
+    color: #666;
 }
 
 /* Footer Styles */
 footer {
     text-align: center;
-    padding: 10px 0;
+    padding: 15px 0;
     background: #35424a;
     color: #ffffff;
     position: fixed;
     bottom: 0;
     width: 100%;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* Dark Mode Styles */
 body.bg-dark {
-    background-color: #000000 !important;
+    background-color: #1c1c1c !important;
+    color: #f8f9fa !important;
+}
+
+body.bg-dark header, body.bg-dark footer {
+    background-color: #121212 !important;
     color: #f8f9fa !important;
 }
 
 a {
-    color: #35424a; /* Default link color */
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
 }
 
 a:hover {
-    text-decoration: underline; /* Underline on hover */
+    text-decoration: underline;
+    color: #2980b9;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
     nav ul li {
-        display: block; /* Stack navigation items on small screens */
+        display: block;
         margin: 10px 0;
+        text-align: center;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    li {
+        margin-bottom: 15px;
+        padding: 10px;
+    }
+}
+/* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s; /* Smooth transition for dark mode */
+}
+
+/* Header Styles */
+header {
+    background: #35424a;
+    color: #ffffff;
+    padding: 20px 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for header */
+}
+
+header h1 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 0 0;
+}
+
+nav ul li {
+    display: inline-block;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out; /* Smooth transition for hover effect */
+}
+
+nav ul li a:hover {
+    color: #f8f9fa; /* Lighter color on hover */
+}
+
+/* Main Content Styles */
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 20px auto;
+}
+
+h2 {
+    color: #35424a;
+    margin-top: 40px;
+    font-size: 1.8rem;
+    border-bottom: 2px solid #ccc;
+    padding-bottom: 10px;
+}
+
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Card-like appearance */
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth scaling */
+}
+
+li:hover {
+    transform: translateY(-5px); /* Lift effect on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+li h3 a {
+    color: #35424a;
+    font-size: 1.4rem;
+}
+
+li p {
+    margin: 10px 0;
+    color: #666;
+}
+
+/* Footer Styles */
+footer {
+    text-align: center;
+    padding: 15px 0;
+    background: #35424a;
+    color: #ffffff;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Mode Styles */
+body.bg-dark {
+    background-color: #1c1c1c !important;
+    color: #f8f9fa !important;
+}
+
+body.bg-dark header, body.bg-dark footer {
+    background-color: #121212 !important;
+    color: #f8f9fa !important;
+}
+
+a {
+    color: #3498db;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #2980b9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    nav ul li {
+        display: block;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    main {
+        padding: 10px;
+    }
+
+    li {
+        margin-bottom: 15px;
+        padding: 10px;
     }
 }

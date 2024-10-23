@@ -7,12 +7,36 @@
     <link rel="stylesheet" href="/static/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #f8f9fa;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        .article-content {
+            margin-bottom: 20px;
+        }
+
+        .article-excerpt {
+            font-style: italic;
+            color: #6c757d;
+        }
+
+        .pagination {
+            justify-content: center;
+        }
+    </style>
 </head>
 <body>
+    <!-- Header with navigation -->
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">{{ title }}</a>
+                <a class="navbar-brand" href="/">Blog Engine</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -33,21 +57,55 @@
         </nav>
     </header>
     
+    <!-- Main content -->
     <main class="container mt-4">
         <h1>{{ title }}</h1>
+
+        <!-- Loop through articles -->
         {% for article in articles %}
-            <div class="mb-4">
+            <div class="article-content">
                 <h2><a href="{{ article.url }}">{{ article.title }}</a></h2>
-                <p>{{ article.excerpt }}</p> <!-- Changed from description to excerpt -->
-                <p>Category: <a href="/category/{{ article.tags[0] }}">{{ article.tags[0] }}</a></p> <!-- Assuming the first tag is the category -->
-                <div>
-                    {{ article.content | safe }} <!-- Render Markdown content safely -->
+                <p class="article-excerpt">{{ article.excerpt }}</p> <!-- Changed from description to excerpt for a preview style -->
+                
+                <!-- Display the first tag as the article category -->
+                <p>Category: <a href="/category/{{ article.tags[0] }}">{{ article.tags[0] }}</a></p>
+                
+                <!-- Render the article content, markdown is assumed to be safe -->
+                <div class="article-body">
+                    {{ article.content | safe }} <!-- Assuming the content is passed with safe HTML -->
                 </div>
-                <p><a href="{{ article.url }}">Read more</a></p>
+
+                <p><a href="{{ article.url }}" class="btn btn-outline-primary">Read more</a></p>
             </div>
         {% endfor %}
+
+        <!-- Pagination -->
+        {% if pagination %}
+            <nav>
+                <ul class="pagination">
+                    {% if pagination.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ pagination.previous_page_url }}">Previous</a>
+                        </li>
+                    {% endif %}
+
+                    {% for page in pagination.pages %}
+                        <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
+                            <a class="page-link" href="{{ page.url }}">{{ page.number }}</a>
+                        </li>
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="{{ pagination.next_page_url }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
     </main>
     
+    <!-- Footer -->
     <footer class="text-center mt-4">
         <p>&copy; 2024 Blog Engine</p>
     </footer>
