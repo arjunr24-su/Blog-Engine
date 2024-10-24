@@ -20,6 +20,9 @@
         .card {
             margin-bottom: 20px;
         }
+        .tags .badge {
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -45,7 +48,7 @@
             </ul>
         </div>
     </nav>
-    
+
     <div class="container mt-4">
         <h1>Articles in Category: {{ title }}</h1>
 
@@ -67,6 +70,13 @@
                             <div class="card-body">
                                 <h5 class="card-title"><a href="{{ article.url }}">{{ article.title }}</a></h5>
                                 <p class="card-text">{{ article.excerpt }}</p>
+                                {% if article.tags %}
+                                    <div class="tags">
+                                        {% for tag in article.tags %}
+                                            <span class="badge bg-secondary">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
                                 <a href="{{ article.url }}" class="btn btn-primary">Read more</a>
                             </div>
                         </div>
@@ -84,7 +94,7 @@
                     <a class="page-link" href="{{ pagination.previous_page_url }}">Previous</a>
                 </li>
                 {% endif %}
-                
+
                 {% for page in pagination.pages %}
                 <li class="page-item {% if page == pagination.current_page %}active{% endif %}">
                     <a class="page-link" href="{{ page.url }}">{{ page.number }}</a>
@@ -100,7 +110,7 @@
         </nav>
         {% endif %}
     </div>
-    
+
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

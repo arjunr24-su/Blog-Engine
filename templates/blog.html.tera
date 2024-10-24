@@ -167,14 +167,16 @@
         <section>
             <h2>Dev.to Blog Posts</h2>
             <ul>
-                {% for article in devto_articles %}
-                    <li>
-                        <h3><a href="{{ article.url }}">{{ article.title }}</a></h3>
-                        <p>{{ article.description | raw }}</p>
-                    </li>
+                {% if devto_articles %}
+                    {% for article in devto_articles %}
+                        <li>
+                            <h3><a href="{{ article.url }}">{{ article.title }}</a></h3>
+                            <p>{{ article.description | default(value="No description available") }}</p>
+                        </li>
+                    {% endfor %}
                 {% else %}
                     <li>No Dev.to articles found.</li>
-                {% endfor %}
+                {% endif %}
             </ul>
         </section>
 
@@ -182,13 +184,15 @@
         <section>
             <h2>Hacker News Stories</h2>
             <ul>
-                {% for story in hacker_news_articles %}
-                    <li>
-                        <h3><a href="{{ story.url }}">{{ story.title }}</a></h3>
-                    </li>
+                {% if hacker_news_articles %}
+                    {% for story in hacker_news_articles %}
+                        <li>
+                            <h3><a href="{{ story.url }}">{{ story.title }}</a></h3>
+                        </li>
+                    {% endfor %}
                 {% else %}
                     <li>No Hacker News stories found.</li>
-                {% endfor %}
+                {% endif %}
             </ul>
         </section>
 
@@ -196,15 +200,17 @@
         <section>
             <h2>All Blog Posts</h2>
             <ul>
-                {% for article in articles %}
-                    <li>
-                        <h3><a href="{{ article.url }}">{{ article.title }}</a></h3>
-                        <p>{{ article.description | raw }}</p>
-                        <span>Category: {{ article.category }}</span>
-                    </li>
+                {% if articles %}
+                    {% for article in articles %}
+                        <li>
+                            <h3><a href="{{ article.url }}">{{ article.title }}</a></h3>
+                            <p>{{ article.description | default(value="No description available") }}</p>
+                            <span>Category: {{ article.category | default(value="Uncategorized") }}</span>
+                        </li>
+                    {% endfor %}
                 {% else %}
                     <li>No articles found.</li>
-                {% endfor %}
+                {% endif %}
             </ul>
         </section>
     </main>
