@@ -112,7 +112,7 @@
             color: #f8f9fa !important;
         }
 
-        body.bg-dark h1, 
+        body.bg-dark h1,
         body.bg-dark h2 {
             color: #f8f9fa !important; /* White text in dark mode */
         }
@@ -197,7 +197,7 @@
             {% for article in recent_articles %}
                 <li class="list-group-item">
                     <h5><a href="{{ article.url }}">{{ article.title }}</a></h5>
-                    <p>{{ article.description | raw }}</p>
+                    <p>{{ article.description }}</p> <!-- Removed 'raw' filter -->
                 </li>
             {% else %}
                 <li class="list-group-item">No recent posts found.</li>

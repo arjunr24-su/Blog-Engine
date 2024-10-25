@@ -3,11 +3,10 @@ extern crate rocket;
 
 use reqwest::blocking::Client;
 use rocket::fs::{relative, FileServer};
-use rocket_dyn_templates::{context, Template}; // Updated to include `context` from `rocket_dyn_templates`
+use rocket_dyn_templates::{context, Template};
 use serde::{Deserialize, Serialize};
 use std::env;
 
-// Struct for blog articles
 #[derive(Deserialize, Serialize, Debug, Clone)]
 struct BlogArticle {
     id: String,
@@ -15,195 +14,120 @@ struct BlogArticle {
     url: String,
     excerpt: String,
     tags: Vec<String>,
-    content: String, // Field for Markdown content
+    content: String,
+    description: Option<String>, // Make description optional
+    category: Option<String>,    // Add optional category field
 }
 
-// Function to fetch blog data from Dev.to
+// Updated fetch_devto_blog_data function with better error handling
 fn fetch_devto_blog_data(api_key: &str) -> Result<Vec<BlogArticle>, String> {
     let url = format!("https://dev.to/api/articles?api_key={}", api_key);
     let client = Client::new();
-    let response = client.get(&url).send().map_err(|e| e.to_string())?;
 
-    if response.status().is_success() {
-        let articles: Vec<BlogArticle> = response.json().map_err(|e| e.to_string())?;
-        Ok(articles)
-    } else {
-        Err(format!(
-            "Error fetching blog data from Dev.to: {}",
-            response.status()
-        ))
-    }
-}
-
-// Function to fetch blog data from Hacker News
-fn fetch_hacker_news_data() -> Result<Vec<BlogArticle>, String> {
-    let url = "https://hacker-news.firebaseio.com/v0/topstories.json";
-    let client = Client::new();
-    let response = client.get(url).send().map_err(|e| e.to_string())?;
-
-    if response.status().is_success() {
-        let ids: Vec<u32> = response.json().map_err(|e| e.to_string())?;
-        let mut articles = Vec::new();
-
-        // Could be parallelized for optimization
-        for id in ids.iter().take(5) {
-            // Fetching top 5 stories
-            let story_url = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", id);
-            let story_response = client.get(&story_url).send().map_err(|e| e.to_string())?;
-
-            if story_response.status().is_success() {
-                let story: BlogArticle = story_response.json().map_err(|e| e.to_string())?;
-                articles.push(story);
+    match client.get(&url).send() {
+        Ok(response) => {
+            if response.status().is_success() {
+                match response.json::<Vec<BlogArticle>>() {
+                    Ok(mut articles) => {
+                        // Ensure each article has at least one tag
+                        for article in &mut articles {
+                            if article.tags.is_empty() {
+                                article.tags.push(String::from("Uncategorized"));
+                            }
+                            // Set description from excerpt if not present
+                            if article.description.is_none() {
+                                article.description = Some(article.excerpt.clone());
+                            }
+                        }
+                        Ok(articles)
+                    }
+                    Err(e) => Err(format!("Failed to parse Dev.to response: {}", e)),
+                }
+            } else {
+                Err(format!("Dev.to API error: {}", response.status()))
             }
         }
-        Ok(articles)
-    } else {
-        Err(format!(
-            "Error fetching blog data from Hacker News: {}",
-            response.status()
-        ))
+        Err(e) => Err(format!("Failed to fetch from Dev.to: {}", e)),
     }
 }
 
-// Fake blog data function
-fn fetch_fake_blog_data() -> Vec<BlogArticle> {
+// Updated fetch_blog_data function
+fn fetch_blog_data(_api_key: &str) -> Vec<BlogArticle> {
+    // For now, return fake data to ensure the site works
     vec![
         BlogArticle {
             id: String::from("1"),
-            title: String::from("Fake Blog Post 1"),
-            url: String::from("https://example.com/post1"),
-            excerpt: String::from("This is a description for fake blog post 1."),
+            title: String::from("Tech Article 1"),
+            url: String::from("https://example.com/tech1"),
+            excerpt: String::from("A tech article about programming"),
             tags: vec![String::from("Tech")],
-            content: String::from("This is **Markdown** content for post 1."),
+            content: String::from("This is the full content of tech article 1"),
+            description: Some(String::from("A tech article about programming")),
+            category: Some(String::from("Tech")),
         },
         BlogArticle {
             id: String::from("2"),
-            title: String::from("Fake Blog Post 2"),
-            url: String::from("https://example.com/post2"),
-            excerpt: String::from("This is a description for fake blog post 2."),
-            tags: vec![String::from("Lifestyle")],
-            content: String::from("This is _Markdown_ content for post 2."),
+            title: String::from("Security Article 1"),
+            url: String::from("https://example.com/security1"),
+            excerpt: String::from("A security article about cybersecurity"),
+            tags: vec![String::from("Security")],
+            content: String::from("This is the full content of security article 1"),
+            description: Some(String::from("A security article about cybersecurity")),
+            category: Some(String::from("Security")),
         },
     ]
 }
 
-// Fetch blog data from all sources
-fn fetch_blog_data(api_key: &str) -> Result<Vec<BlogArticle>, String> {
-    let devto_articles = if let Ok(articles) = fetch_devto_blog_data(api_key) {
-        articles
-    } else {
-        eprintln!("Failed to fetch Dev.to articles.");
-        Vec::new()
-    };
-
-    let hacker_news_articles = if let Ok(articles) = fetch_hacker_news_data() {
-        articles
-    } else {
-        eprintln!("Failed to fetch Hacker News articles.");
-        Vec::new()
-    };
-
-    let mut combined_articles = devto_articles;
-    combined_articles.extend(hacker_news_articles);
-
-    if combined_articles.is_empty() {
-        Ok(fetch_fake_blog_data())
-    } else {
-        Ok(combined_articles)
-    }
-}
-
-// Function to render Markdown to HTML
-fn render_markdown(content: &str) -> String {
-    let mut html_output = String::new();
-    let parser = pulldown_cmark::Parser::new(content);
-    pulldown_cmark::html::push_html(&mut html_output, parser);
-    html_output
-}
-
-// Home page route
 #[get("/")]
 fn index() -> Template {
-    let api_key = env::var("DEVTO_API_KEY").unwrap_or_else(|_| String::from(""));
-    let articles_result = fetch_blog_data(&api_key);
-
-    let articles = match articles_result {
-        Ok(mut articles) => {
-            // Convert Markdown content to HTML for each article
-            for article in &mut articles {
-                article.content = render_markdown(&article.content);
-            }
-            articles
-        }
-        Err(err) => {
-            eprintln!("Error fetching posts: {}", err);
-            Vec::<BlogArticle>::new() // Return empty Vec on error
-        }
-    };
-
+    let articles = fetch_blog_data("dummy_key");
     Template::render(
         "index",
         context! {
             title: "Blog Engine",
-            articles,
+            message: "Welcome to the Blog Engine",
+            recent_articles: articles,
         },
     )
 }
 
-// List posts route
 #[get("/posts")]
 fn list_posts() -> Template {
-    let api_key = env::var("DEVTO_API_KEY").expect("Dev.to API key not set");
-    let articles_result = fetch_blog_data(&api_key);
-
-    let articles = match articles_result {
-        Ok(mut articles) => {
-            // Convert Markdown content to HTML for each article
-            for article in &mut articles {
-                article.content = render_markdown(&article.content);
-            }
-            articles
-        }
-        Err(err) => {
-            eprintln!("Error fetching posts: {}", err);
-            Vec::<BlogArticle>::new() // Return empty Vec on error
-        }
-    };
-
-    let context = context! {
-        title: "All Blog Posts",
-        articles,
-    };
-
-    Template::render("posts", &context)
+    let articles = fetch_blog_data("dummy_key");
+    Template::render(
+        "posts",
+        context! {
+            title: "All Blog Posts",
+            articles: articles,
+        },
+    )
 }
 
-// Posts by category route
 #[get("/category/<tag>")]
 fn posts_by_category(tag: String) -> Template {
-    let api_key = env::var("DEVTO_API_KEY").expect("Dev.to API key not set");
-    let articles_result = fetch_blog_data(&api_key);
+    let all_articles = fetch_blog_data("dummy_key");
 
-    let filtered_articles = match articles_result {
-        Ok(articles) => articles
-            .into_iter()
-            .filter(|article| article.tags.contains(&tag))
-            .collect(),
-        Err(err) => {
-            eprintln!("Error fetching posts by category: {}", err);
-            Vec::<BlogArticle>::new() // Return empty Vec on error
-        }
-    };
+    // Filter articles by tag (case-insensitive)
+    let filtered_articles: Vec<BlogArticle> = all_articles
+        .into_iter()
+        .filter(|article| {
+            article
+                .tags
+                .iter()
+                .any(|t| t.to_lowercase() == tag.to_lowercase())
+        })
+        .collect();
 
-    let context = context! {
-        title: format!("Posts in Category: {}", tag),
-        articles: filtered_articles,
-    };
-
-    Template::render("category", &context)
+    Template::render(
+        "category",
+        context! {
+            title: format!("Posts in Category: {}", tag),
+            articles: filtered_articles,
+            category_description: format!("All articles in the {} category", tag),
+        },
+    )
 }
 
-// Launch the Rocket application
 #[launch]
 fn rocket() -> _ {
     rocket::build()
