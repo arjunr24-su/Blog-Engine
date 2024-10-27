@@ -1,13 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
 import json
+import time
 
 def scrape_devto_articles():
     url = "https://dev.to"
-    response = requests.get(url)
     articles = []
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad responses
+
         soup = BeautifulSoup(response.text, 'html.parser')
         posts = soup.find_all('div', class_='crayons-story')[:5]  # Limit to top 5 posts
 
@@ -26,16 +29,21 @@ def scrape_devto_articles():
                 "url": url + link if link else url,
                 "excerpt": excerpt,
                 "tags": ["Dev.to"],
-                "content": excerpt
+                "content": excerpt  # Consider fetching full content if needed
             })
+    except requests.RequestException as e:
+        print(f"Failed to fetch Dev.to articles: {e}")
+
     return articles
 
 def scrape_hacker_news():
-    url = "https://hacker-news.firebaseio.com/v0/topstories.json"
-    response = requests.get(url)
     articles = []
+    url = "https://hacker-news.firebaseio.com/v0/topstories.json"
 
-    if response.status_code == 200:
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an error for bad responses
+
         top_ids = response.json()[:5]  # Limit to top 5 stories
         for story_id in top_ids:
             story_url = f"https://hacker-news.firebaseio.com/v0/item/{story_id}.json"
@@ -51,12 +59,18 @@ def scrape_hacker_news():
                     "tags": ["Hacker News"],
                     "content": story.get("text", "")
                 })
+            time.sleep(1)  # Sleep to avoid hitting the server too hard
+    except requests.RequestException as e:
+        print(f"Failed to fetch Hacker News articles: {e}")
+
     return articles
 
 if __name__ == "__main__":
     devto_articles = scrape_devto_articles()
+    time.sleep(1)  # Sleep between scraping different sites
     hacker_news_articles = scrape_hacker_news()
     all_articles = devto_articles + hacker_news_articles
 
     # Print as JSON to pass back to Rust
     print(json.dumps(all_articles, ensure_ascii=False))
+

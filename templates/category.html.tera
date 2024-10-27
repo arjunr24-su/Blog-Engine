@@ -6,22 +6,82 @@
     <title>{{ title }}</title>
     <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <style>
-        /* Additional styles for customization */
+        /* General Styles */
         body {
             background-color: #f4f4f4;
             color: #333;
+            font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        /* Navbar Styles */
         .navbar {
             margin-bottom: 20px;
+            background-color: #35424a !important;
+            color: #ffffff !important;
         }
+
+        .navbar-brand, .nav-link {
+            color: #ffffff !important;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #f8f9fa !important;
+        }
+
+        /* Header Styles */
         h1 {
             color: #35424a;
-        }
-        .card {
             margin-bottom: 20px;
         }
+
+        /* Card Styles */
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title a {
+            color: #35424a;
+            font-size: 1.2rem;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .card-title a:hover {
+            color: #2980b9;
+        }
+
+        .card-text {
+            color: #666;
+        }
+
         .tags .badge {
             margin-right: 5px;
+            background-color: #6c757d;
+        }
+
+        /* Pagination Styles */
+        .pagination .page-item.active .page-link {
+            background-color: #35424a;
+            border-color: #35424a;
+        }
+
+        .pagination .page-link {
+            color: #35424a;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .pagination .page-link:hover {
+            background-color: #2980b9;
+            color: #ffffff;
         }
     </style>
 </head>
@@ -114,3 +174,4 @@
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+

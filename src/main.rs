@@ -1,13 +1,13 @@
 #[macro_use]
 extern crate rocket;
 
-use reqwest::blocking::Client;
 use rocket::fs::{relative, FileServer};
 use rocket_dyn_templates::{context, Template};
 use serde::{Deserialize, Serialize};
-use std::env;
+use reqwest::Client;
+use std::process::Command;
 
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct BlogArticle {
     id: String,
     title: String,
@@ -15,74 +15,69 @@ struct BlogArticle {
     excerpt: String,
     tags: Vec<String>,
     content: String,
-    description: Option<String>, // Make description optional
-    category: Option<String>,    // Add optional category field
+    description: Option<String>,
+    category: Option<String>,
 }
 
-// Updated fetch_devto_blog_data function with better error handling
-fn fetch_devto_blog_data(api_key: &str) -> Result<Vec<BlogArticle>, String> {
-    let url = format!("https://dev.to/api/articles?api_key={}", api_key);
-    let client = Client::new();
+// Python-based scraper function
+async fn fetch_python_scraped_data() -> Vec<BlogArticle> {
+    let output = Command::new("python3")
+        .arg("scraper.py")
+        .output()
+        .expect("Failed to execute scraper");
 
-    match client.get(&url).send() {
-        Ok(response) => {
-            if response.status().is_success() {
-                match response.json::<Vec<BlogArticle>>() {
-                    Ok(mut articles) => {
-                        // Ensure each article has at least one tag
-                        for article in &mut articles {
-                            if article.tags.is_empty() {
-                                article.tags.push(String::from("Uncategorized"));
-                            }
-                            // Set description from excerpt if not present
-                            if article.description.is_none() {
-                                article.description = Some(article.excerpt.clone());
-                            }
-                        }
-                        Ok(articles)
-                    }
-                    Err(e) => Err(format!("Failed to parse Dev.to response: {}", e)),
-                }
-            } else {
-                Err(format!("Dev.to API error: {}", response.status()))
-            }
-        }
-        Err(e) => Err(format!("Failed to fetch from Dev.to: {}", e)),
+    if output.status.success() {
+        let json_str = String::from_utf8_lossy(&output.stdout);
+        serde_json::from_str(&json_str).unwrap_or_else(|_| Vec::new())
+    } else {
+        eprintln!("Python scraper error: {:?}", output.stderr);
+        Vec::new()
     }
 }
 
-// Updated fetch_blog_data function
-fn fetch_blog_data(_api_key: &str) -> Vec<BlogArticle> {
-    // For now, return fake data to ensure the site works
-    vec![
-        BlogArticle {
-            id: String::from("1"),
-            title: String::from("Tech Article 1"),
-            url: String::from("https://example.com/tech1"),
-            excerpt: String::from("A tech article about programming"),
-            tags: vec![String::from("Tech")],
-            content: String::from("This is the full content of tech article 1"),
-            description: Some(String::from("A tech article about programming")),
-            category: Some(String::from("Tech")),
-        },
-        BlogArticle {
-            id: String::from("2"),
-            title: String::from("Security Article 1"),
-            url: String::from("https://example.com/security1"),
-            excerpt: String::from("A security article about cybersecurity"),
-            tags: vec![String::from("Security")],
-            content: String::from("This is the full content of security article 1"),
-            description: Some(String::from("A security article about cybersecurity")),
-            category: Some(String::from("Security")),
-        },
-    ]
+// Fetch data from Dev.to API using the given API key
+async fn fetch_devto_blog_data(api_key: &str) -> Result<Vec<BlogArticle>, String> {
+    let url = format!("https://dev.to/api/articles?api_key={}", api_key);
+    let client = Client::new(); // Use async client
+
+    let response = client.get(&url).send().await.map_err(|e| e.to_string())?;
+    
+    if response.status().is_success() {
+        let mut articles: Vec<BlogArticle> = response.json().await.map_err(|e| e.to_string())?;
+        
+        for article in &mut articles {
+            if article.tags.is_empty() {
+                article.tags.push(String::from("Uncategorized"));
+            }
+            if article.description.is_none() {
+                article.description = Some(article.excerpt.clone());
+            }
+        }
+        Ok(articles)
+    } else {
+        Err(format!("Dev.to API error: {}", response.status()))
+    }
 }
 
+// Function to retrieve blog data using API key or Python scraper
+async fn fetch_blog_data() -> Vec<BlogArticle> {
+    let api_key = "44h9fR1BfEW98AUVrkNJYVbd"; // Replace with your actual API key
+    
+    // Try to fetch from Dev.to, fallback to the Python scraper
+    if let Ok(devto_articles) = fetch_devto_blog_data(api_key).await {
+        devto_articles
+    } else {
+        fetch_python_scraped_data().await
+    }
+}
+
+// Routes
+
 #[get("/")]
-fn index() -> Template {
-    let articles = fetch_blog_data("dummy_key");
+async fn index() -> Template {
+    let articles = fetch_blog_data().await; // Await the data fetch
     Template::render(
-        "index",
+        "index", // Ensure this matches your template file name
         context! {
             title: "Blog Engine",
             message: "Welcome to the Blog Engine",
@@ -92,8 +87,8 @@ fn index() -> Template {
 }
 
 #[get("/posts")]
-fn list_posts() -> Template {
-    let articles = fetch_blog_data("dummy_key");
+async fn list_posts() -> Template {
+    let articles = fetch_blog_data().await; // Await the data fetch
     Template::render(
         "posts",
         context! {
@@ -104,8 +99,8 @@ fn list_posts() -> Template {
 }
 
 #[get("/category/<tag>")]
-fn posts_by_category(tag: String) -> Template {
-    let all_articles = fetch_blog_data("dummy_key");
+async fn posts_by_category(tag: String) -> Template {
+    let all_articles = fetch_blog_data().await; // Await the data fetch
 
     // Filter articles by tag (case-insensitive)
     let filtered_articles: Vec<BlogArticle> = all_articles
@@ -128,10 +123,12 @@ fn posts_by_category(tag: String) -> Template {
     )
 }
 
+// Launch the Rocket application
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, list_posts, posts_by_category])
-        .attach(Template::fairing())
-        .mount("/static", FileServer::from(relative!("static")))
+        .mount("/", routes![index, list_posts, posts_by_category]) // Include other routes as needed
+        .attach(Template::fairing()) // Ensure template fairing is attached
+        .mount("/static", FileServer::from(relative!("static"))) // Serve static files
 }
+
