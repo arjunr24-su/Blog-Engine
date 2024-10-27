@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,11 +8,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <style>
-        /* Custom styles */
+        /* Light mode styles */
+        :root[data-bs-theme="light"] {
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+            --heading-color: #35424a;
+            --card-bg: #ffffff;
+            --card-shadow: rgba(0, 0, 0, 0.1);
+            --nav-bg: #f8f9fa;
+            --footer-bg: #35424a;
+            --footer-text: #ffffff;
+        }
+
+        /* Dark mode styles */
+        :root[data-bs-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --text-color: #e1e1e1;
+            --heading-color: #ffffff;
+            --card-bg: #2d2d2d;
+            --card-shadow: rgba(0, 0, 0, 0.3);
+            --nav-bg: #2d2d2d;
+            --footer-bg: #1a1a1a;
+            --footer-text: #e1e1e1;
+        }
+
         body {
-            background-color: #f8f9fa;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: Arial, sans-serif;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         header {
@@ -20,15 +44,20 @@
         }
 
         h1, h2 {
-            color: #35424a;
+            color: var(--heading-color);
+        }
+
+        .navbar {
+            background-color: var(--nav-bg) !important;
         }
 
         .article-content {
             margin-bottom: 20px;
-            background-color: white;
+            background-color: var(--card-bg);
             padding: 20px;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px var(--card-shadow);
+            transition: background-color 0.3s;
         }
 
         .article-excerpt {
@@ -41,13 +70,14 @@
         }
 
         .pagination .page-item.active .page-link {
-            background-color: #35424a;
-            border-color: #35424a;
+            background-color: var(--heading-color);
+            border-color: var(--heading-color);
         }
 
         .pagination .page-link {
-            color: #35424a;
+            color: var(--heading-color);
             transition: color 0.3s;
+            background-color: var(--card-bg);
         }
 
         .pagination .page-link:hover {
@@ -56,27 +86,50 @@
         }
 
         footer {
-            background-color: #35424a;
-            color: #ffffff;
+            background-color: var(--footer-bg);
+            color: var(--footer-text);
             padding: 15px 0;
+            transition: background-color 0.3s;
         }
 
         footer p {
             margin: 0;
+        }
+
+        /* Dark mode toggle button styles */
+        .theme-toggle {
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-toggle svg {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 <body>
     <!-- Header with navigation -->
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <nav class="navbar navbar-expand-lg">
             <div class="container-fluid">
                 <a class="navbar-brand" href="/">Blog Engine</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
                             <a class="nav-link" href="/">Home</a>
                         </li>
@@ -87,6 +140,19 @@
                             <a class="nav-link" href="/category/Security">Security</a>
                         </li>
                     </ul>
+                    <button class="theme-toggle btn" aria-label="Toggle theme">
+                        <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="5"/>
+                            <line x1="12" y1="1" x2="12" y2="3"/>
+                            <line x1="12" y1="21" x2="12" y2="23"/>
+                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                            <line x1="1" y1="12" x2="3" y2="12"/>
+                            <line x1="21" y1="12" x2="23" y2="12"/>
+                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </nav>
@@ -100,16 +166,11 @@
         {% for article in articles %}
             <div class="article-content">
                 <h2><a href="{{ article.url }}">{{ article.title }}</a></h2>
-                <p class="article-excerpt">{{ article.excerpt }}</p> <!-- Changed from description to excerpt for a preview style -->
-                
-                <!-- Display the first tag as the article category -->
+                <p class="article-excerpt">{{ article.excerpt }}</p>
                 <p>Category: <a href="/category/{{ article.tags[0] }}">{{ article.tags[0] }}</a></p>
-                
-                <!-- Render the article content, markdown is assumed to be safe -->
                 <div class="article-body">
-                    {{ article.content | safe }} <!-- Assuming the content is passed with safe HTML -->
+                    {{ article.content | safe }}
                 </div>
-
                 <p><a href="{{ article.url }}" class="btn btn-outline-primary">Read more</a></p>
             </div>
         {% endfor %}
@@ -144,6 +205,54 @@
     <footer class="text-center mt-4">
         <p>&copy; 2024 Blog Engine</p>
     </footer>
+
+    <script>
+        // Dark mode functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const html = document.documentElement;
+            const themeToggle = document.querySelector('.theme-toggle');
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme) {
+                html.setAttribute('data-bs-theme', savedTheme);
+                updateThemeIcon(savedTheme);
+            }
+
+            // Toggle theme
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-bs-theme');
+                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                
+                html.setAttribute('data-bs-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+                updateThemeIcon(newTheme);
+            });
+
+            // Update theme icon based on current theme
+            function updateThemeIcon(theme) {
+                const sunIcon = `
+                    <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                `;
+                const moonIcon = `
+                    <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                    </svg>
+                `;
+                
+                themeToggle.innerHTML = theme === 'light' ? sunIcon : moonIcon;
+            }
+        });
+    </script>
 </body>
 </html>
-
