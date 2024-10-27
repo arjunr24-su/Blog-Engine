@@ -5,7 +5,7 @@ use rocket::fs::{relative, FileServer};
 use rocket_dyn_templates::{context, Template};
 use serde::{Deserialize, Serialize};
 use reqwest::Client;
-use std::process::Command;
+use std::time::Duration;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct BlogArticle {
@@ -19,65 +19,137 @@ struct BlogArticle {
     category: Option<String>,
 }
 
-// Python-based scraper function
-async fn fetch_python_scraped_data() -> Vec<BlogArticle> {
-    let output = Command::new("python3")
-        .arg("scraper.py")
-        .output()
-        .expect("Failed to execute scraper");
+// Fetch articles from Dev.to (using HTML scraping)
+async fn scrape_devto_articles() -> Vec<BlogArticle> {
+    let url = "https://dev.to";
+    let client = Client::new();
+    let mut articles = Vec::new();
 
-    if output.status.success() {
-        let json_str = String::from_utf8_lossy(&output.stdout);
-        serde_json::from_str(&json_str).unwrap_or_else(|_| Vec::new())
-    } else {
-        eprintln!("Python scraper error: {:?}", output.stderr);
-        Vec::new()
+    match client.get(url).send().await {
+        Ok(response) => {
+            if let Ok(text) = response.text().await {
+                let document = scraper::Html::parse_document(&text);
+                let post_selector = scraper::Selector::parse("div.crayons-story").unwrap();
+                let title_selector = scraper::Selector::parse("h2.crayons-story__title").unwrap();
+                let link_selector = scraper::Selector::parse("a.crayons-story__hidden-navigation").unwrap();
+                let excerpt_selector = scraper::Selector::parse("p.crayons-story__description").unwrap();
+
+                for post in document.select(&post_selector).take(5) {
+                    let title = post.select(&title_selector).next().map(|e| e.inner_html()).unwrap_or_else(|| "No title".to_string());
+                    let link = post.select(&link_selector).next().and_then(|e| e.value().attr("href")).unwrap_or("").to_string();
+                    let excerpt = post.select(&excerpt_selector).next().map(|e| e.inner_html()).unwrap_or_else(|| "No excerpt".to_string());
+
+                    articles.push(BlogArticle {
+                        id: link.split('/').last().unwrap_or("No ID").to_string(),
+                        title,
+                        url: format!("{}{}", url, link),
+                        excerpt: excerpt.clone(),
+                        tags: vec!["Dev.to".to_string()],
+                        content: excerpt,
+                        description: None,
+                        category: None,
+                    });
+                }
+            }
+        },
+        Err(e) => eprintln!("Failed to fetch Dev.to articles: {}", e),
     }
+
+    articles
 }
 
-// Fetch data from Dev.to API using the given API key
-async fn fetch_devto_blog_data(api_key: &str) -> Result<Vec<BlogArticle>, String> {
-    let url = format!("https://dev.to/api/articles?api_key={}", api_key);
-    let client = Client::new(); // Use async client
+// Fetch articles from Hacker News API
+async fn scrape_hacker_news() -> Vec<BlogArticle> {
+    let mut articles = Vec::new();
+    let client = Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()
+        .expect("Failed to create client");
+    let url = "https://hacker-news.firebaseio.com/v0/topstories.json";
 
-    let response = client.get(&url).send().await.map_err(|e| e.to_string())?;
-    
-    if response.status().is_success() {
-        let mut articles: Vec<BlogArticle> = response.json().await.map_err(|e| e.to_string())?;
-        
-        for article in &mut articles {
-            if article.tags.is_empty() {
-                article.tags.push(String::from("Uncategorized"));
+    match client.get(url).send().await {
+        Ok(response) => {
+            if let Ok(top_ids) = response.json::<Vec<u32>>().await {
+                for &story_id in top_ids.iter().take(5) {
+                    let story_url = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", story_id);
+                    if let Ok(story_response) = client.get(&story_url).send().await {
+                        if let Ok(story) = story_response.json::<serde_json::Value>().await {
+                            let title = story["title"].as_str().unwrap_or("No title").to_string();
+                            let url = story["url"].as_str().unwrap_or("").to_string();
+                            let text = story["text"].as_str().unwrap_or("No description").to_string();
+
+                            articles.push(BlogArticle {
+                                id: story_id.to_string(),
+                                title,
+                                url,
+                                excerpt: text.clone(),
+                                tags: vec!["Hacker News".to_string()],
+                                content: text,
+                                description: None,
+                                category: None,
+                            });
+                        }
+                    }
+                    tokio::time::sleep(Duration::from_secs(1)).await;
+                }
             }
-            if article.description.is_none() {
-                article.description = Some(article.excerpt.clone());
-            }
-        }
-        Ok(articles)
-    } else {
-        Err(format!("Dev.to API error: {}", response.status()))
+        },
+        Err(e) => eprintln!("Failed to fetch Hacker News articles: {}", e),
     }
+
+    articles
 }
 
-// Function to retrieve blog data using API key or Python scraper
+// Fetch articles from Reddit
+async fn scrape_reddit() -> Vec<BlogArticle> {
+    let mut articles = Vec::new();
+    let client = Client::new();
+    let url = "https://www.reddit.com/r/popular.json"; // Reddit's popular posts
+
+    match client.get(url).header("User-Agent", "rust-app").send().await {
+        Ok(response) => {
+            if let Ok(data) = response.json::<serde_json::Value>().await {
+                if let Some(posts) = data["data"]["children"].as_array() {
+                    for post in posts.iter().take(5) {
+                        let title = post["data"]["title"].as_str().unwrap_or("No title").to_string();
+                        let url = post["data"]["url"].as_str().unwrap_or("").to_string();
+                        let excerpt = post["data"]["selftext"].as_str().unwrap_or("No description").to_string();
+
+                        articles.push(BlogArticle {
+                            id: post["data"]["id"].as_str().unwrap_or("No ID").to_string(),
+                            title,
+                            url,
+                            excerpt: excerpt.clone(),
+                            tags: vec!["Reddit".to_string()],
+                            content: excerpt,
+                            description: None,
+                            category: None,
+                        });
+                    }
+                }
+            }
+        },
+        Err(e) => eprintln!("Failed to fetch Reddit articles: {}", e),
+    }
+
+    articles
+}
+
+// Combine data fetching from all sources
 async fn fetch_blog_data() -> Vec<BlogArticle> {
-    let api_key = "44h9fR1BfEW98AUVrkNJYVbd"; // Replace with your actual API key
-    
-    // Try to fetch from Dev.to, fallback to the Python scraper
-    if let Ok(devto_articles) = fetch_devto_blog_data(api_key).await {
-        devto_articles
-    } else {
-        fetch_python_scraped_data().await
-    }
+    let mut articles = scrape_devto_articles().await;
+    articles.extend(scrape_hacker_news().await);
+    articles.extend(scrape_reddit().await);
+    articles
 }
 
 // Routes
 
 #[get("/")]
 async fn index() -> Template {
-    let articles = fetch_blog_data().await; // Await the data fetch
+    let articles = fetch_blog_data().await;
     Template::render(
-        "index", // Ensure this matches your template file name
+        "index",
         context! {
             title: "Blog Engine",
             message: "Welcome to the Blog Engine",
@@ -88,7 +160,7 @@ async fn index() -> Template {
 
 #[get("/posts")]
 async fn list_posts() -> Template {
-    let articles = fetch_blog_data().await; // Await the data fetch
+    let articles = fetch_blog_data().await;
     Template::render(
         "posts",
         context! {
@@ -100,7 +172,7 @@ async fn list_posts() -> Template {
 
 #[get("/category/<tag>")]
 async fn posts_by_category(tag: String) -> Template {
-    let all_articles = fetch_blog_data().await; // Await the data fetch
+    let all_articles = fetch_blog_data().await;
 
     // Filter articles by tag (case-insensitive)
     let filtered_articles: Vec<BlogArticle> = all_articles
@@ -127,8 +199,7 @@ async fn posts_by_category(tag: String) -> Template {
 #[launch]
 fn rocket() -> _ {
     rocket::build()
-        .mount("/", routes![index, list_posts, posts_by_category]) // Include other routes as needed
-        .attach(Template::fairing()) // Ensure template fairing is attached
-        .mount("/static", FileServer::from(relative!("static"))) // Serve static files
+        .mount("/", routes![index, list_posts, posts_by_category])
+        .attach(Template::fairing())
+        .mount("/static", FileServer::from(relative!("static")))
 }
-
