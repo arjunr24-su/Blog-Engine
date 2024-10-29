@@ -206,7 +206,7 @@
         <p>&copy; 2024 Blog Engine</p>
     </footer>
 
-    <script>
+   <script>
         // Dark mode functionality
         document.addEventListener('DOMContentLoaded', () => {
             const html = document.documentElement;
@@ -217,6 +217,9 @@
             if (savedTheme) {
                 html.setAttribute('data-bs-theme', savedTheme);
                 updateThemeIcon(savedTheme);
+                if (savedTheme === 'dark') {
+                    html.classList.add('dark');
+                }
             }
 
             // Toggle theme
@@ -226,6 +229,7 @@
                 
                 html.setAttribute('data-bs-theme', newTheme);
                 localStorage.setItem('theme', newTheme);
+                html.classList.toggle('dark');
                 updateThemeIcon(newTheme);
             });
 

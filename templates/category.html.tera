@@ -1,91 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
     <style>
-        /* General Styles */
+        /* General Body Styles */
         body {
             background-color: #f4f4f4;
             color: #333;
-            font-family: Arial, sans-serif;
             transition: background-color 0.3s, color 0.3s;
         }
 
         /* Navbar Styles */
         .navbar {
-            margin-bottom: 20px;
-            background-color: #35424a !important;
-            color: #ffffff !important;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 10px 10px;
+            padding: 15px 20px;
+            transition: background-color 0.3s ease;
         }
 
-        .navbar-brand, .nav-link {
-            color: #ffffff !important;
-            transition: color 0.3s;
+        .navbar-brand {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #35424a;
+            transition: color 0.3s ease;
         }
 
-        .nav-link:hover {
+        .navbar-brand:hover {
+            color: #007bff;
+        }
+
+        .navbar-nav .nav-link {
+            font-weight: 500;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #007bff;
+        }
+
+        /* Dark Mode Styles */
+        body.bg-dark {
+            background-color: #1c1c1c !important;
             color: #f8f9fa !important;
         }
 
-        /* Header Styles */
-        h1 {
-            color: #35424a;
-            margin-bottom: 20px;
+        body.bg-dark .navbar {
+            background-color: rgba(0, 0, 0, 0.85) !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
         }
 
-        /* Card Styles */
+        body.bg-dark .navbar-brand,
+        body.bg-dark .nav-link {
+            color: #f8f9fa !important;
+        }
+
+        body.bg-dark .nav-link:hover {
+            color: #3498db !important;
+        }
+
+        body.bg-dark .card {
+            background-color: #2d2d2d;
+            border-color: #444;
+        }
+
+        body.bg-dark .card-title a {
+            color: #f8f9fa;
+        }
+
+        body.bg-dark .card-text {
+            color: #d1d1d1;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: background-color 0.3s ease;
+        }
+
+        body.bg-dark .filter-controls {
+            background-color: rgba(45, 45, 45, 0.9);
+        }
+
+        /* Article Cards */
         .card {
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s, box-shadow 0.2s;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .card-title a {
-            color: #35424a;
-            font-size: 1.2rem;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .card-title a:hover {
-            color: #2980b9;
-        }
-
-        .card-text {
-            color: #666;
-        }
-
-        .tags .badge {
+        .tag-badge {
+            font-size: 0.8rem;
             margin-right: 5px;
-            background-color: #6c757d;
+            margin-bottom: 5px;
+            display: inline-block;
         }
 
-        /* Pagination Styles */
-        .pagination .page-item.active .page-link {
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 15px 0;
             background-color: #35424a;
-            border-color: #35424a;
-        }
-
-        .pagination .page-link {
-            color: #35424a;
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .pagination .page-link:hover {
-            background-color: #2980b9;
             color: #ffffff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .navbar {
+                padding: 10px;
+            }
+
+            .filter-controls .row {
+                flex-direction: column;
+            }
+
+            .filter-controls .col-md-4 {
+                margin-bottom: 15px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="/">Blog</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -106,49 +161,85 @@
                     <a class="nav-link" href="/category/security">Security</a>
                 </li>
             </ul>
+            <button id="theme-toggle" class="btn btn-secondary ms-auto">Toggle Dark Mode</button>
         </div>
     </nav>
 
     <div class="container mt-4">
-        <h1>Articles in Category: {{ title }}</h1>
+        <!-- Category Header -->
+        <div class="mb-4">
+            <h1>{{ title }}</h1>
+            {% if category_description %}
+            <p class="lead">{{ category_description }}</p>
+            {% endif %}
+        </div>
 
-        <!-- Category description (if available) -->
-        {% if category_description %}
-        <p>{{ category_description }}</p>
-        {% endif %}
+        <!-- Filter Controls -->
+        <div class="filter-controls shadow-sm">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="source-filter" class="form-label">Source</label>
+                    <select id="source-filter" class="form-select">
+                        <option value="all">All Sources</option>
+                        <option value="Dev.to">Dev.to</option>
+                        <option value="Hacker News">Hacker News</option>
+                        <option value="Medium">Medium</option>
+                        <option value="TechCrunch">TechCrunch</option>
+                        <option value="The Guardian">The Guardian</option>
+                        <option value="Mashable">Mashable</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="sort-order" class="form-label">Sort By</label>
+                    <select id="sort-order" class="form-select">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="title">Title (A-Z)</option>
+                        <option value="source">Source</option>
+                    </select>
+                </div>
+            </div>
+        </div>
 
-        <!-- Articles List -->
-        <div class="row">
+        <!-- Articles Grid -->
+        <div class="row" id="articles-grid">
             {% if articles|length == 0 %}
                 <div class="col-12">
                     <div class="alert alert-info">No articles found in this category.</div>
                 </div>
             {% else %}
-                {% for article in articles %}
-                    <div class="col-md-4">
-                        <div class="card">
+                {% for source, items in articles | group_by(attribute="tags[0]") %}
+                <div class="source-group" data-source="{{ source }}">
+                    <h2 class="h4 mb-3">{{ source }}</h2>
+                    {% for article in items %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title"><a href="{{ article.url }}">{{ article.title }}</a></h5>
-                                <p class="card-text">{{ article.excerpt }}</p>
+                                <h5 class="card-title">
+                                    <a href="{{ article.url }}" class="text-decoration-none">{{ article.title }}</a>
+                                </h5>
+                                <p class="card-text">{{ article.excerpt | truncate(length=150) }}</p>
                                 {% if article.tags %}
-                                    <div class="tags">
-                                        {% for tag in article.tags %}
-                                            <span class="badge bg-secondary">{{ tag }}</span>
-                                        {% endfor %}
-                                    </div>
+                                <div class="mb-3">
+                                    {% for tag in article.tags %}
+                                    <span class="badge bg-secondary tag-badge">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                                 <a href="{{ article.url }}" class="btn btn-primary">Read more</a>
                             </div>
                         </div>
                     </div>
+                    {% endfor %}
+                </div>
                 {% endfor %}
             {% endif %}
         </div>
 
-        <!-- Pagination (if available) -->
+        <!-- Pagination -->
         {% if pagination %}
-        <nav>
-            <ul class="pagination">
+        <nav aria-label="Page navigation" class="mt-4 mb-5">
+            <ul class="pagination justify-content-center">
                 {% if pagination.has_previous %}
                 <li class="page-item">
                     <a class="page-link" href="{{ pagination.previous_page_url }}">Previous</a>
@@ -171,7 +262,78 @@
         {% endif %}
     </div>
 
+    <footer>
+        <p>&copy; 2024 Blog Engine</p>
+    </footer>
+
+    <!-- Scripts -->
     <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Theme Toggle
+            const toggleButton = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme');
+
+            // Apply saved theme
+            if (currentTheme === 'dark') {
+                document.body.classList.add('bg-dark');
+                toggleButton.textContent = 'Toggle Light Mode';
+            }
+
+            toggleButton.addEventListener('click', () => {
+                document.body.classList.toggle('bg-dark');
+                const isDarkMode = document.body.classList.contains('bg-dark');
+                localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+                toggleButton.textContent = isDarkMode ? 'Toggle Light Mode' : 'Toggle Dark Mode';
+            });
+
+            // Filtering and Sorting
+            const sourceFilter = document.getElementById('source-filter');
+            const sortOrder = document.getElementById('sort-order');
+            const articlesGrid = document.getElementById('articles-grid');
+
+            // Filter by source
+            sourceFilter.addEventListener('change', function() {
+                const selectedSource = this.value;
+                const sourceGroups = document.querySelectorAll('.source-group');
+
+                sourceGroups.forEach(group => {
+                    if (selectedSource === 'all' || group.dataset.source === selectedSource) {
+                        group.style.display = 'block';
+                    } else {
+                        group.style.display = 'none';
+                    }
+                });
+            });
+
+            // Sort articles
+            sortOrder.addEventListener('change', function() {
+                const sourceGroups = Array.from(document.querySelectorAll('.source-group'));
+                const sortType = this.value;
+
+                sourceGroups.sort((a, b) => {
+                    switch(sortType) {
+                        case 'newest':
+                            return new Date(b.dataset.date) - new Date(a.dataset.date);
+                        case 'oldest':
+                            return new Date(a.dataset.date) - new Date(b.dataset.date);
+                        case 'source':
+                            return a.dataset.source.localeCompare(b.dataset.source);
+                        case 'title':
+                            const titleA = a.querySelector('h5').textContent.trim();
+                            const titleB = b.querySelector('h5').textContent.trim();
+                            return titleA.localeCompare(titleB);
+                        default:
+                            return 0;
+                    }
+                });
+
+                // Re-append sorted elements
+                sourceGroups.forEach(group => {
+                    articlesGrid.appendChild(group);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
-

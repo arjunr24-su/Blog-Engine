@@ -1,0 +1,70 @@
+2024-10-28 13:17:21.517 [info] [main] Log level: Info
+2024-10-28 13:17:21.517 [info] [main] Validating found git in: "git"
+2024-10-28 13:17:21.517 [info] [main] Using git "2.39.5" from "git"
+2024-10-28 13:17:21.517 [info] [Model][doInitialScan] Initial repository scan started
+2024-10-28 13:17:21.517 [info] > git rev-parse --show-toplevel [4ms]
+2024-10-28 13:17:21.517 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.517 [info] > git rev-parse --show-toplevel [0ms]
+2024-10-28 13:17:21.517 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.521 [info] > git rev-parse --show-toplevel [0ms]
+2024-10-28 13:17:21.521 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.525 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:17:21.525 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.529 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:17:21.529 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.532 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:17:21.532 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:17:21.534 [info] [Model][doInitialScan] Initial repository scan completed - repositories (0), closed repositories (0), parent repositories (0), unsafe repositories (1)
+2024-10-28 13:17:32.116 [info] > git rev-parse --show-toplevel [0ms]
+2024-10-28 13:17:32.116 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:19:55.060 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:19:55.060 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:20:51.402 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:20:51.402 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:21:02.719 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:21:02.719 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:22:11.217 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:22:11.217 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:22:25.744 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:22:25.744 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
+2024-10-28 13:23:58.515 [info] > git rev-parse --show-toplevel [1ms]
+2024-10-28 13:23:58.515 [info] fatal: detected dubious ownership in repository at '/home/arjun/amfoss/Blog-Engine'
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory /home/arjun/amfoss/Blog-Engine
