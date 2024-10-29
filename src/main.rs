@@ -17,6 +17,18 @@ struct BlogArticle {
     content: String,
     description: Option<String>,
     category: Option<String>,
+    source: String,  // Added source field
+}
+
+// Article categorization function
+fn categorize_article(article: &BlogArticle) -> &'static str {
+    match article.source.as_str() {
+        "Dev.to" | "Engadget" => "tech",
+        "Reddit" | "Medium" | "Mashable" => "lifestyle",
+        "The Guardian" | "ProPublica" => "security",
+        "Hacker News" => "news",
+        _ => "other",
+    }
 }
 
 // Fetch articles from Dev.to
@@ -34,7 +46,7 @@ async fn scrape_devto_articles() -> Vec<BlogArticle> {
         Ok(response) => {
             if let Ok(posts) = response.json::<Vec<serde_json::Value>>().await {
                 for post in posts.iter().take(5) {
-                    articles.push(BlogArticle {
+                    let article = BlogArticle {
                         id: post["id"].to_string(),
                         title: post["title"].as_str().unwrap_or("No title").to_string(),
                         url: post["url"].as_str().unwrap_or("").to_string(),
@@ -43,7 +55,9 @@ async fn scrape_devto_articles() -> Vec<BlogArticle> {
                         content: post["body_markdown"].as_str().unwrap_or("").to_string(),
                         description: Some(post["description"].as_str().unwrap_or("").to_string()),
                         category: None,
-                    });
+                        source: "Dev.to".to_string(),
+                    };
+                    articles.push(article);
                 }
             }
         },
@@ -69,20 +83,18 @@ async fn scrape_hacker_news() -> Vec<BlogArticle> {
                     let story_url = format!("https://hacker-news.firebaseio.com/v0/item/{}.json", story_id);
                     if let Ok(story_response) = client.get(&story_url).send().await {
                         if let Ok(story) = story_response.json::<serde_json::Value>().await {
-                            let title = story["title"].as_str().unwrap_or("No title").to_string();
-                            let url = story["url"].as_str().unwrap_or("").to_string();
-                            let text = story["text"].as_str().unwrap_or("No description").to_string();
-
-                            articles.push(BlogArticle {
+                            let article = BlogArticle {
                                 id: story_id.to_string(),
-                                title,
-                                url,
-                                excerpt: text.clone(),
+                                title: story["title"].as_str().unwrap_or("No title").to_string(),
+                                url: story["url"].as_str().unwrap_or("").to_string(),
+                                excerpt: story["text"].as_str().unwrap_or("No description").to_string(),
                                 tags: vec!["Hacker News".to_string()],
-                                content: text,
+                                content: story["text"].as_str().unwrap_or("No description").to_string(),
                                 description: None,
                                 category: None,
-                            });
+                                source: "Hacker News".to_string(),
+                            };
+                            articles.push(article);
                         }
                     }
                     tokio::time::sleep(Duration::from_millis(100)).await;
@@ -127,7 +139,7 @@ async fn scrape_medium_articles() -> Vec<BlogArticle> {
                         .map(|e| e.inner_html())
                         .unwrap_or_else(|| "No excerpt".to_string());
 
-                    articles.push(BlogArticle {
+                    let article = BlogArticle {
                         id: link.split('/').last().unwrap_or("No ID").to_string(),
                         title,
                         url: if link.starts_with("http") { link.clone() } else { format!("https://medium.com{}", link) },
@@ -136,7 +148,9 @@ async fn scrape_medium_articles() -> Vec<BlogArticle> {
                         content: excerpt,
                         description: None,
                         category: None,
-                    });
+                        source: "Medium".to_string(),
+                    };
+                    articles.push(article);
                 }
             }
         },
@@ -178,7 +192,7 @@ async fn scrape_techcrunch_articles() -> Vec<BlogArticle> {
                         .map(|e| e.inner_html())
                         .unwrap_or_else(|| "No excerpt".to_string());
 
-                    articles.push(BlogArticle {
+                    let article = BlogArticle {
                         id: link.split('/').last().unwrap_or("No ID").to_string(),
                         title,
                         url: link,
@@ -187,7 +201,9 @@ async fn scrape_techcrunch_articles() -> Vec<BlogArticle> {
                         content: excerpt,
                         description: None,
                         category: None,
-                    });
+                        source: "TechCrunch".to_string(),
+                    };
+                    articles.push(article);
                 }
             }
         },
@@ -212,20 +228,18 @@ async fn scrape_guardian_articles() -> Vec<BlogArticle> {
             if let Ok(data) = response.json::<serde_json::Value>().await {
                 if let Some(results) = data["response"]["results"].as_array() {
                     for result in results.iter().take(5) {
-                        let title = result["webTitle"].as_str().unwrap_or("No title").to_string();
-                        let url = result["webUrl"].as_str().unwrap_or("").to_string();
-                        let content = result["fields"]["bodyText"].as_str().unwrap_or("No content").to_string();
-
-                        articles.push(BlogArticle {
+                        let article = BlogArticle {
                             id: result["id"].as_str().unwrap_or("No ID").to_string(),
-                            title,
-                            url,
-                            excerpt: content[..200].to_string() + "...",
+                            title: result["webTitle"].as_str().unwrap_or("No title").to_string(),
+                            url: result["webUrl"].as_str().unwrap_or("").to_string(),
+                            excerpt: result["fields"]["bodyText"].as_str().unwrap_or("No content")[..200].to_string() + "...",
                             tags: vec!["The Guardian".to_string()],
-                            content,
+                            content: result["fields"]["bodyText"].as_str().unwrap_or("No content").to_string(),
                             description: None,
                             category: None,
-                        });
+                            source: "The Guardian".to_string(),
+                        };
+                        articles.push(article);
                     }
                 }
             }
@@ -268,7 +282,7 @@ async fn scrape_mashable_articles() -> Vec<BlogArticle> {
                         .map(|e| e.inner_html())
                         .unwrap_or_else(|| "No excerpt".to_string());
 
-                    articles.push(BlogArticle {
+                    let article = BlogArticle {
                         id: link.split('/').last().unwrap_or("No ID").to_string(),
                         title,
                         url: if link.starts_with("http") { link.clone() } else { format!("https://mashable.com{}", link) },
@@ -277,7 +291,9 @@ async fn scrape_mashable_articles() -> Vec<BlogArticle> {
                         content: excerpt,
                         description: None,
                         category: None,
-                    });
+                        source: "Mashable".to_string(),
+                    };
+                    articles.push(article);
                 }
             }
         },
@@ -287,7 +303,7 @@ async fn scrape_mashable_articles() -> Vec<BlogArticle> {
     articles
 }
 
-// Combine data fetching from all sources
+// Combine and categorize data from all sources
 async fn fetch_blog_data() -> Vec<BlogArticle> {
     let mut articles = Vec::new();
     
@@ -299,29 +315,46 @@ async fn fetch_blog_data() -> Vec<BlogArticle> {
     let guardian = tokio::spawn(scrape_guardian_articles());
     let mashable = tokio::spawn(scrape_mashable_articles());
 
-    // Collect results
-    if let Ok(devto_articles) = devto.await {
+    // Collect and categorize results
+    if let Ok(mut devto_articles) = devto.await {
+        for article in devto_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(devto_articles);
     }
-    if let Ok(hn_articles) = hacker_news.await {
+    if let Ok(mut hn_articles) = hacker_news.await {
+        for article in hn_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(hn_articles);
     }
-    if let Ok(medium_articles) = medium.await {
+    if let Ok(mut medium_articles) = medium.await {
+        for article in medium_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(medium_articles);
     }
-    if let Ok(techcrunch_articles) = techcrunch.await {
+    if let Ok(mut techcrunch_articles) = techcrunch.await {
+        for article in techcrunch_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(techcrunch_articles);
     }
-    if let Ok(guardian_articles) = guardian.await {
+    if let Ok(mut guardian_articles) = guardian.await {
+        for article in guardian_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(guardian_articles);
     }
-    if let Ok(mashable_articles) = mashable.await {
+    if let Ok(mut mashable_articles) = mashable.await {
+        for article in mashable_articles.iter_mut() {
+            article.category = Some(categorize_article(&article).to_string());
+        }
         articles.extend(mashable_articles);
     }
 
     articles
 }
-
 // Routes remain the same
 #[get("/")]
 async fn index() -> Template {
