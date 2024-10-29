@@ -160,6 +160,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/category/security">Security</a>
                 </li>
+                <li class="nav-item">
+                            <a class="nav-link" href="/category/Lifestyle">Lifestyle</a>
+                        </li><li class="nav-item"><a class="nav-link" href="/category/News">News</a></li>
             </ul>
             <button id="theme-toggle" class="btn btn-secondary ms-auto">Toggle Dark Mode</button>
         </div>
