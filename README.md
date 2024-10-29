@@ -1,7 +1,3 @@
-Here's a comprehensive `README.md` file based on the project progress, successes, and challenges you encountered. This document will help showcase everything developed so far, along with details on troubleshooting, tool configurations, and significant adjustments made.
-
----
-
 # Blog Engine Project
 
 This project is a Rust-based blog engine that aggregates content from multiple sources and presents it in a cohesive, markdown-friendly format. Designed with a functional backend and a simple UI, this blog engine serves as an educational and practical example of working with Rust frameworks, web scraping, data parsing, and templating.
